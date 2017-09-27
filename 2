@@ -5,22 +5,23 @@ let MAP;
 //GEO LOCATING
 function geolocate(props){
   return new Promise(function(res,rej){
-    //First try by browser
-    if(navigator.geolocation){
+    if(!props){
       navigator.geolocation.getCurrentPosition(
       function(position){
         res(position.coords); 
       },function(error){
-          axios.post(`https://www.googleapis.com/geolocation/v1/geolocate?key=${API_KEY}`)
-          .then(function(response){
-            res(response);
-          })
-          .catch(function(error){
-            rej(error);
-          });
+        rej(error);
+      });
+    }else{
+      axios.post(`https://www.googleapis.com/geolocation/v1/geolocate?key=${API_KEY}`)
+      .then(function(response){
+        res(response);
+      })
+      .catch(function(error){
+        rej(error);
       });
     }
-  });
+  })
 }
 
 //GEO-CODING
@@ -44,7 +45,7 @@ function initMap(){
   geolocate().then(function(location){
     MAP = new google.maps.Map(document.getElementById('map'),{
       zoom: 8,
-      center: {lat:location.latitude,lng:location.longitude}
+      center: location
     });
   });
   google.maps.event.addListener(map,'click',function(event){
@@ -71,14 +72,16 @@ function addMarker(props){
   }
 }
 
-//INIT
+// main.js
 function loadGoogleMapsApi(){
 	if(typeof google === "undefined"){
 		var script = document.createElement("script");
-		script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&callback=initMap`;
+		script.src = "https://maps.googleapis.com/maps/api/js?key=${API_KEY}&sensor=false&callback=initMap";
 		document.getElementsByTagName("head")[0].appendChild(script);
 	} else {
 		initMap();
 	}
 }
+
+//INIT
 loadGoogleMapsApi();
