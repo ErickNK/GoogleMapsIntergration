@@ -14,14 +14,17 @@
         background-color: white;
         border-radius: 4px;
         padding: 10px;
+        z-index: 1000;
       }
     </style>
   </head>
   <body>
     <div style="position: relative;">
       <div id="locQuery">
-        <input type="text" placeholder="Enter the location here">
-        <button onclick="getLatLng">OK</button>
+        <input id="addressInput" type="text" placeholder="Enter the location here">
+        <input id="long" name="longitude" type="hidden">
+        <input id="lat" name="longitude" type="hidden">
+        <button onclick="getLatLng()">OK</button>
       </div>
       <div id="map"></div>
     </div>
