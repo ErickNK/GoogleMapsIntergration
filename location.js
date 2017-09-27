@@ -1,0 +1,73 @@
+const API_KEY = 'AIzaSyBixSBMVXJ-a_8a7VNzXttqmCIm7GP1WbU';
+//MAIN MAP
+let MAP;
+
+//GEO LOCATING
+function geolocate(props){
+  return new Promise(function(res,rej){
+    if(!props){
+      navigator.geolocation.getCurrentPosition(
+      function(position){
+        res(position.coords); 
+      },function(error){
+        rej(error);
+      });
+    }else{
+      axios.post(`https://www.googleapis.com/geolocation/v1/geolocate?key=${API_KEY}`)
+      .then(function(response){
+        res(response);
+      })
+      .catch(function(error){
+        rej(error);
+      });
+    }
+  })
+}
+
+//GEO-CODING
+function geocode(location){
+  axios.get('https://maps.googleapis.com/maps/api/geocode/json',{
+    params:{
+      address: location,
+      key: API_KEY
+    }
+  })
+  .then(function(response){
+    console.log(response);
+  })
+  .catch(function(error){
+    console.log(error)
+  })
+}
+
+//CREATING MAP
+function initMap(){
+  geolocate().then(function(location){
+    MAP = new google.maps.Map(document.getElementById('map'),{
+      zoom: 8,
+      center: location
+    });
+  });
+  google.maps.event.addListener(map,'click',function(event){
+      addMarker({coords:event.latLng})
+    });
+}
+
+//ADDING MARKER
+function addMarker(props){
+  var marker = new google.maps.Marker({
+    position: props.coords,
+    map:MAP,
+  });
+  if(props.icon){
+    marker.setIcon(props.icon);
+  }
+  if(props.content){
+    var infoWindow = new google.maps.InfoWindow({
+      content: props.content
+    });
+    marker.addListener('click',function(){
+      infoWindow.open(map,marker);
+    })
+  }
+}
